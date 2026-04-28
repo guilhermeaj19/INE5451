@@ -1,41 +1,37 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#define ll long long
 
+typedef long long ll;
 
-ll count_divisors(ll n) {
-    ll ans = 0;
-    for (ll i = 1; i * i <= n; i++) {
-        if (n % i == 0) {
-            ans += i; // divisor i
-            if (i != n / i) {
-                ans += n / i; // divisor n/i
-            }
-        }
-    }
-    return ans;
-}
-
-int main() {
+int main()
+{
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N;
-    cin >> N;
+    ll n;
+    cin >> n;
 
-    ll MOD = 1000000007;
+    ll mod = 1000000007;
+    ll inv2 = 500000004;
+    ll total_sum = 0;
 
-    ll ans = 0;
+    for (ll l = 1, r; l <= n; l = r + 1)
+    {
+        ll k = n / l;
+        r = n / k;
+        if (r > n)
+            r = n;
 
-    for (int i = 1; i <= N; i++) {
-        ll count = count_divisors(i);
-        // cout << "Number: " << i << ", Divisors: " << count << endl;
-        ans = (ans + count) % MOD;
+        ll num_terms = (r - l + 1) % mod;
+        ll sum_interval = ((l + r) % mod * num_terms) % mod;
+        sum_interval = (sum_interval * inv2) % mod;
+
+        ll contrib_block = (sum_interval * (k % mod)) % mod;
+        total_sum = (total_sum + contrib_block) % mod;
     }
 
-    cout << ans << endl;
-
+    cout << total_sum << endl;
 
     return 0;
 }

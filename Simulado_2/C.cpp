@@ -1,41 +1,43 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#define ll long long
 
-ll solve(ll N)
+typedef long long ll;
+
+const int MAX = 1000001;
+ll phi[MAX];
+ll f[MAX];
+ll G[MAX];
+
+void precompute()
 {
-    vector<ll> phi(N + 1);
-    for (ll i = 0; i <= N; i++)
-    {
+    for (int i = 0; i < MAX; i++)
         phi[i] = i;
-    }
-
-    for (ll i = 2; i <= N; i++)
+    for (int i = 2; i < MAX; i++)
     {
         if (phi[i] == i)
         {
-            for (ll j = i; j <= N; j += i)
+            for (int j = i; j < MAX; j += i)
             {
-
                 phi[j] -= phi[j] / i;
             }
         }
     }
 
-    vector<ll> S(N + 1, 0);
-    for (ll i = 2; i <= N; i++)
+    for (int d = 1; d < MAX; d++)
     {
-
-        S[i] = S[i - 1] + phi[i];
+        for (int n = 2 * d; n < MAX; n += d)
+        {
+            f[n] += (ll)d * phi[n / d];
+        }
     }
 
-    ll G = 0;
-    for (ll g = 1; g <= N; g++)
+    G[0] = 0;
+    G[1] = 0;
+    for (int i = 2; i < MAX; i++)
     {
-        G += (ll)g * S[N / g];
+        G[i] = G[i - 1] + f[i];
     }
-    return G;
 }
 
 int main()
@@ -43,10 +45,12 @@ int main()
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N;
+    precompute();
+
+    int N;
     while (cin >> N && N != 0)
     {
-        cout << solve(N) << endl;
+        cout << G[N] << "\n";
     }
 
     return 0;

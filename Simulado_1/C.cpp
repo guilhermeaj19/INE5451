@@ -3,73 +3,64 @@
 using namespace std;
 #define ll long long
 
-const long long MOD = 1000000007;
+const int MAX = 1000005;
+ll phi[MAX];
+ll phi_prefix[MAX];
 
-ll power(ll base, ll exp)
+void precompute_phi()
 {
-    ll result = 1;
-    base = base % MOD;
-
-    while (exp > 0)
+    for (int i = 0; i < MAX; i++)
     {
-        if (exp % 2 == 1)
+        phi[i] = i;
+    }
+
+    for (int i = 2; i < MAX; i++)
+    {
+        if (phi[i] == i)
         {
-            result = (result * base) % MOD;
+            for (int j = i; j < MAX; j += i)
+            {
+                phi[j] -= phi[j] / i;
+            }
         }
-        base = (base * base) % MOD;
-        exp /= 2;
     }
-    return result;
+
+    phi_prefix[0] = 0;
+    for (int i = 1; i < MAX; i++)
+    {
+        phi_prefix[i] = phi_prefix[i - 1] + phi[i];
+    }
 }
 
-ll modInverse(ll n)
+int main()
 {
-    return power(n, MOD-2);
-}
-
-int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
+    cin.tie(NULL);
 
-    int n, T;
-    cin >> n >> T;
+    precompute_phi();
 
-    if (T > n) {
-        cout << 0 << endl;
-        return 0;
-    }
+    ll N;
+    ll count, total_sum, val_n_t, l, r, current_phi_sum;
+    
+    while (cin >> N && N != 0)
+    {
+        total_sum = 0;
 
-    vector<ll> fact(n + 1, 1);
-    vector<ll> invFact(n + 1, 1);
+        for (l = 1, r; l <= N && l <= N; l = r + 1)
+        {
+            val_n_t = N / l;
 
-    for (int i = 1; i <= n; i++) {
-        fact[i] = (fact[i - 1] * i) % MOD;
-    }
+            r = N / val_n_t;
+ 
+            count = (val_n_t * (val_n_t - 1)) / 2;
 
-    invFact[n] = modInverse(fact[n]);
-    for (int i = n - 1; i >= 1; i--) {
-        invFact[i] = (invFact[i + 1] * (i + 1)) % MOD;
-    }
+            current_phi_sum = phi_prefix[r] - phi_prefix[l - 1];
 
-    vector<ll> dp(n + 1, 0);
-    ll current_sum = 0;
-
-    for (int i = T; i <= n; i++) {
-        if (i > T) {
-            ll term_add = (dp[i-1] * invFact[i-1]) % MOD;
-            current_sum = (current_sum + term_add) % MOD;
-
-            ll term_sub = (dp[i-T] * invFact[i-T]) % MOD;
-            current_sum = (current_sum - term_sub + MOD) % MOD;
-
+            total_sum += count * current_phi_sum;
         }
 
-        ll part1 = fact[i-1]*current_sum % MOD;
-        ll part2 = (1LL * (i-T+1) * fact[i-1]) % MOD;
-        dp[i] = (part1 + part2) % MOD;
+        cout << total_sum << "\n";
     }
-
-    cout << dp[n] << endl;
 
     return 0;
 }
